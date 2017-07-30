@@ -1,0 +1,27 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    volumes:
+      - './app:/testapp/app/'
+      - '${CERT_PATH}:/etc/docker-compose/cert/'
+    environment:
+      PUBLIC_CERT_PATH: '/etc/docker-compose/cert/server.crt'
+      PRIVATE_KEY_PATH: '/etc/docker-compose/cert/server.key'
+      DB_PASSWORD: '${DB_PASSWORD}'
+    links:
+      - db
+  db:
+    image: 'mariadb:10.3.0'
+    volumes:
+      - './mariadb:/docker-entrypoint-initdb.d'
+      - 'db-data:/var/lib/mysql'
+    environment:
+      MYSQL_DATABASE: 'test'
+      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
+      MYSQL_USER: 'app'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+volumes:
+  db-data:
